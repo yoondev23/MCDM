@@ -4,7 +4,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>다기준의사결정 (MCDM)</title>
+    다기준의사결정 (MCDM)
 </head>
 <body>
     <h1>다기준의사결정 (MCDM)에 대해 알아보기</h1>
