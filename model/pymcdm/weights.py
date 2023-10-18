@@ -7,16 +7,16 @@ from .correlations import correlation_matrix, pearson
 from scipy.linalg import null_space
 
 __all__ = [
-    'equal_weights',
-    'entropy_weights',
-    'standard_deviation_weights',
-    'merec_weights',
-    'critic_weights',
-    'cilos_weights',
-    'idocriw_weights',
-    'angle_weights',
-    'gini_weights',
-    'variance_weights'
+    'equal_weights', # 동일한 가중치
+    'entropy_weights', # 엔트로피 가중치
+    'standard_deviation_weights', # 표준편차 가중치
+    'merec_weights', # 미레크 가중치
+    'critic_weights', # 비평가 가중치
+    'cilos_weights', # 씨로스 가중치
+    'idocriw_weights', # 이도크리우 가중치
+    'angle_weights', # 각도 가중치
+    'gini_weights', # 지니 가중치
+    'variance_weights' # 분산 가중치
 ]
 
 
