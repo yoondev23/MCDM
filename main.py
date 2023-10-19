@@ -38,23 +38,37 @@ def data_load(cfg):
     DATASET_PATH =  os.path.join('dataset')
     EU_dataset_nm = cfg['EU_dataset_nm']
     df_barr = pd.read_csv(os.path.join(DATASET_PATH, EU_dataset_nm))
+
+    # 위치 좌표를 담을 리스트 초기화
     barrier_point = []
     for i in range(len(df_barr)):
         barrier_point += [[df_barr['위도'][i]] + [df_barr['경도'][i]]]
+
+    # 데이터프레임의 모든 요인을 저장할 집합 초기화
     factor = set()
+
+    # '요인' 열을 반복하며 요인을 추출하고 집합에 추가
     for i in df_barr['요인']:
         if i == i:
             factor_list = i.split(',')
             for j in factor_list:
                 factor.add(j)
+
+    # 모든 요인을 열로 추가하고, 해당 요인이 있는 경우 해당 열 값을 1로 설정
     for i in factor:
         df_barr[i] = 0
+        
     #요인이 'nan'인 경우 삭제
     df_barr = df_barr.dropna(subset=['요인'])
+
+    # 각 요인이 있는 경우 해당 열 값을 1로 설정
     for i in factor:
         df_barr.loc[df_barr['요인'].str.contains(i), i] = 1
+
+     # '주의대상' 열에 '휠체어'가 포함된 행만 선택하여 반환
     df_barr_target = df_barr[df_barr['주의대상'].str.contains('휠체어')]
     return df_barr_target
+
 
 def route2factor(cfg, df_barr_target, route_):#route를 geopandas로 변경 후, 해당 route에 있는 factor개수 counting
     df_barr = df_barr_target
