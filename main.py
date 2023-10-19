@@ -34,6 +34,8 @@ def load_config(config_filename: str, CONFIG_PATH=os.path.join('config'), **kwar
         cfg = yaml.load(f, Loader=yaml.FullLoader)
     return cfg
 
+
+# 주의 대상 "휠체어"가 포함된 행 반환 함수
 def data_load(cfg):
     DATASET_PATH =  os.path.join('dataset')
     EU_dataset_nm = cfg['EU_dataset_nm']
@@ -70,11 +72,13 @@ def data_load(cfg):
     return df_barr_target
 
 
+# 경로 주변의 장애물 요인계산. 요인들에 대한 가중치를 적용하여 계산된 값을 반환
 def route2factor(cfg, df_barr_target, route_):#route를 geopandas로 변경 후, 해당 route에 있는 factor개수 counting
     df_barr = df_barr_target
     weight = cfg['Weight']
     coor_1m = (1/88.74/1000) #약 1m
-    
+
+    # 경로 좌표를 이용하여 GeoPandas GeoDataFrame 생성
     df = pd.DataFrame(route_)
     gdf = gpd.GeoDataFrame(
         df, geometry=gpd.points_from_xy(df[0], df[1]),  crs="EPSG:4326")
@@ -83,6 +87,8 @@ def route2factor(cfg, df_barr_target, route_):#route를 geopandas로 변경 후,
     gdf_1 = gpd.GeoDataFrame(gdf_1, geometry='geometry')
     # gdf_1.buffer(0.0001).plot()
 
+
+     # 요인 집합 초기화 및 요인 데이터프레임 전처리
     factor = set()    
     for i in df_barr['요인']:
         if i == i:
@@ -95,14 +101,25 @@ def route2factor(cfg, df_barr_target, route_):#route를 geopandas로 변경 후,
 
     for i in factor:
         df_barr.loc[df_barr['요인'].str.contains(i), i] = 1
+
+    # 휠체어 관련 요인 데이터프레임을 GeoPandas GeoDataFrame으로 변환
     gdf_barr = gpd.GeoDataFrame(
         df_barr, geometry=gpd.points_from_xy(df_barr['위도'], df_barr['경도']),  crs="EPSG:4326")
-    gdf_buffer = gpd.GeoDataFrame(gdf_1.buffer(coor_1m*10), geometry=0, crs="EPSG:4326") # 반경 약 10m의 장애 요인들 고려
-    polygons_contains = gpd.sjoin(gdf_buffer, gdf_barr , op='contains')           
+
+    # 경로 주변의 10미터 반경 버퍼 생성. 반경 약 10m의 장애 요인들 고려
+    gdf_buffer = gpd.GeoDataFrame(gdf_1.buffer(coor_1m*10), geometry=0, crs="EPSG:4326") 
+
+    # 버퍼 내 포함된 장애물 계산
+    polygons_contains = gpd.sjoin(gdf_buffer, gdf_barr , op='contains')     
+
+    # 장애물 요인을 요약하여 데이터프레임 생성
     df_factor = pd.DataFrame(polygons_contains[['안내시설',	'경사',	'통행폭',	'높이',	'돌출물',	'단차',	'마감']].sum()).T
+
+    # 가중치를 곱하여 요인 값 조정  (weight 정의는 methods 폴더 안에 있음)
     for key in list(weight.keys()):
         df_factor[key] = df_factor[key].apply(lambda x: weight[key]*x)
-    
+
+     # 요인 데이터프레임 출력 후 반환
     print(df_factor)
     return df_factor
 
