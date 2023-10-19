@@ -196,9 +196,9 @@ config_filename = args.config_filename  # 설정 파일 경로
 route_path = args.route_path  # 경로 데이터 파일 경로
 SAVE_PATH = args.SAVE_PATH  # 결과 저장 디렉토리 경로
 
-cfg = load_config(config_filename)
-df_barr_target = data_load(cfg)
-df_route2factor = route_load(cfg, route_path)
+cfg = load_config(config_filename) # 설정 파일 (YAML)을 불러와 cfg 변수에 저장
+df_barr_target = data_load(cfg) # 설정을 기반으로 휠체어 관련 요인 데이터를 불러옴
+df_route2factor = route_load(cfg, route_path) # 경로 데이터 파일을 사용하여 경로와 장애물 요인을 계산하여 데이터프레임 생성
 result = mcdm_run(df_route2factor, save_name=SAVE_PATH) # 다중 기준 의사결정 실행 및 결과 저장
 
 print(1) # 결과가 완료되었음을 나타내는 메시지 출력
